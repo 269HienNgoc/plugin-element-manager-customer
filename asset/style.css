@@ -1,0 +1,53 @@
+.form_send_data {
+    margin: 10px 0;
+}
+
+.send_data {
+    margin: 10px 0;
+}
+
+.send_data input[type=text]{
+width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #6b6a6a;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.show_info {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    margin: 10px 30px;
+    grid-gap: 20px;
+}
+
+.send_data .label_code {
+    font-size: 30px;
+    color: #002836;
+}
+
+.send_data #btn_send_code, .send_data .label_code {
+    margin: 10px 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.show_info p, .show_info span {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.show_info span {
+    font-weight: bold;
+}
+
+@media only screen and (max-width: 48em) {
+    /*************** ADD MOBILE ONLY CSS HERE  ***************/
+    .show_info {
+        grid-template-columns: auto;
+        margin: 8px 10px;
+        grid-gap: 10px;
+    }
+}
