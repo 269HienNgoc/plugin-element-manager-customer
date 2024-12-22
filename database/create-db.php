@@ -40,6 +40,7 @@ if (!class_exists('CreateDB')) {
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             fullname VARCHAR(255) NOT NULL,
                             address_info VARCHAR(255) NOT NULL,
+                            year_birth VARCHAR(255) NOT NULL,
                             phone VARCHAR(255) NOT NULL,
                             code VARCHAR(255) NOT NULL,
                             warranty_time DATE NOT NULL,

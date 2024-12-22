@@ -8,6 +8,7 @@ $my_list_table->prepare_items();
 ?>
 <div class="title"><h1>QUẢN LÝ KHÁCH HÀNG - THỜI GIAN BẢO HÀNH</h1></div>
 <div class="wrap">
+    <div class="search-note" style ="color: #00b715;"><p style=" font-size: 20px !important; font-weight: 600;">Tìm kiếm bằng mã CODE hoặc tên KHÁCH HÀNG</p></div>
     <form id="my-list-table" action="<?php echo admin_url('admin.php?page=hd-manager-customer') ?>" method="post">
         <input type="hidden" name="page" value="list-books">
 

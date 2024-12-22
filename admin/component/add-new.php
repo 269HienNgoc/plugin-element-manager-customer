@@ -8,6 +8,10 @@
     <input type="text" id="fullname" name="fullname" placeholder="Nhập địa chỉ..." >
   </div>
   <div class="form-group">
+    <label for="year-brith">Năm sinh</label>
+    <input type="text" id="year-brith" name="year-brith" placeholder="Nhập năm sinh..." >
+  </div>
+  <div class="form-group">
     <label for="nameAddress">Địa chỉ</label>
     <input type="text" id="nameAddress" name="nameAddress" placeholder="Nhập địa chỉ..." required>
   </div>

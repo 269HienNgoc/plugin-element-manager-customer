@@ -43,7 +43,7 @@ final class Custom_element {
 
     public function RegisterCssJs(){
         //JS
-        wp_register_script( 'widget-script-1', HDEL_PLUGIN_URL . '/asset/script.js', [],HDEL_VERSION_CSS_JS, true );
+        wp_register_script( 'widget-script-1', HDEL_PLUGIN_URL . '/asset/script_interface.js', ['jquery'],HDEL_VERSION_CSS_JS, true );
 
         //CSS
         wp_register_style( 'widget-style-1', HDEL_PLUGIN_URL . '/asset/style.css',[], HDEL_VERSION_CSS_JS, 'all'  );

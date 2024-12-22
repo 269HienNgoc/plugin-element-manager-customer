@@ -34,10 +34,42 @@ class Widget_form_data extends Widget_Base
         return ['widget-style-1'];
     }
 
-    protected function render()
+    private function Search_($req)
     {
+        global $wpdb;
+
+        $table = $wpdb->prefix . "hd_manager_customer";
+
+        $search = sanitize_text_field($req) ?? false;
+        if ($search) {
+            $result = $wpdb->get_results("SELECT 
+                                                    a.id,
+                                                    a.fullname,
+                                                    a.year_birth,
+                                                    a.address_info,
+                                                    a.phone,
+                                                    a.code,
+                                                    a.warranty_time,
+                                                    a.active,
+                                                    a.service_,
+                                                    a.note,
+                                                    p.branch_name
+                                                FROM
+                                                    $table a
+                                                LEFT JOIN {$wpdb->prefix}hd_branch p ON a.branch_id = p.id
+                                                WHERE
+                                                    code = '{$search}' ", output: ARRAY_A);
+            return $result;
+        }
+
+    }
+
+    protected function render()
+    {   
+        $data = $this->Search_($_REQUEST['search_code']);
+        
         ob_start();
-        $cont = require_once HDEL_PLUGIN_DIR . '/widget/component/form-data.html';
+        $cont = require_once HDEL_PLUGIN_DIR . '/widget/component/form-data.php';
         $cont = ob_get_contents();
         ob_end_clean();
         echo $cont;

@@ -11,6 +11,7 @@ class List_table extends WP_List_Table
             'id'    => 'ID',
             'code'      => 'Mã Code',
             'fullname'    => 'Họ và tên',
+            'year_birth'    => 'Năm sinh',
             'address_info'  => 'Địa chỉ',
             'phone'  => 'SĐT',
             'active'  => 'Tình trạng',
@@ -97,7 +98,6 @@ class List_table extends WP_List_Table
             'per_page'    => $per_page,
             'total_pages' => ceil($total_items / $per_page)
         ));
-
         if(!empty($action_table)){
             $this->ModifyActionBtn($action_table);
         }
@@ -111,13 +111,14 @@ class List_table extends WP_List_Table
             case 'id':
             case 'code':
             case 'fullname':
+            case 'year_birth':
             case 'address_info':
             case 'active':
             case 'warranty_time':
             case 'branch_id':
             case 'service_':
             case 'note':
-                return $item[$column_name];
+                return $item[$column_name] ? '<span class="hd-'. $column_name . '">'. $item[$column_name] .'</span>' : 'N/A';
             default:
                 return print_r($item, true); //Hiển thị toàn bộ object nếu không tìm thấy cột
         }
@@ -153,15 +154,19 @@ class List_table extends WP_List_Table
                 case 'fullname':
                     echo "<td class='$column_name column-$column_name'>";
 
-                    echo $item['fullname'] . '<br>' ;
-    
+                    echo '<span class="hd-customer-name">'. $item['fullname'] . '</span><br>' ;
+                    // echo $item['fullname'] . '<br>';
+
                     // Nút "Sửa"
-                    echo '<a href="?page=my_page&action=edit&id=' . $item['id'] . '">Sửa</a> | ';
+                    echo '<a href="#" class="hd-quick-edit">Sửa Nhanh</a> | ';
     
                     // Nút "Xóa"
-                    echo '<a style="color: #ff0000;" href="?page=hd_manager_customer&action=delete&id=' . $item['id'] . '" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>';
+                    echo '<a style="color: #ff0000;" href="admin.php?page=hd-manager-customer&action=delete&id=' . $item['id'] . '" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>';
                     echo "</td>";
                     break;
+                case 'year_birth':
+                    echo "<td $attributes>" . $item['year_birth'] . "</td>";  
+                    break;    
 
                 case 'address_info':
                     echo "<td $attributes>" . $item['address_info'] . "</td>";  
@@ -195,24 +200,25 @@ class List_table extends WP_List_Table
     private function CheckActive(int $active_) {
         $mess = '';
         if($active_ == 0){
-            return $mess = '<p style="color: #ff0000">Hết hạn</p>';
+            return $mess = '<p style="color: #ff0000">Expired</p>';
         } else if($active_ == 1) {
-            return $mess = '<p style="color: #00b715">Còn Hạn</p>';
+            return $mess = '<p style="color: #00b715">Available</p>';
         }
     }
 
-    public function ModifyActionBtn( $id){
+    public function ModifyActionBtn($actions){
         global $wpdb;
-        $actions = $this->current_action();
-        if ( $_REQUEST['id'] != '' && $_REQUEST['id'] != null ) {
+        if ( !empty($actions) ) {
             switch ( $actions ) {
                 case 'edit':
                     // Xử lý hành động "Sửa"
+                    $wpdb->update("{$wpdb->perfix}hd_manager_customer", [
 
+                    ]);
                     break;
                 case 'delete':
                     // Xử lý hành động "Xóa"
-                    $wpdb->delete("{$wpdb->prefix}", [
+                        $wpdb->delete("{$wpdb->prefix}hd_manager_customer", [
                         'id' =>  $_REQUEST['id'],
                     ]);
             break;

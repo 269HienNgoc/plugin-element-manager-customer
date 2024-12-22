@@ -37,6 +37,8 @@ if (!class_exists('AdminMenu')) {
             add_action('admin_menu', [$this, 'AddMenuAdmin']);
             //Register CSS, JS
             add_action('admin_enqueue_scripts', [$this, 'RegisterScript']);
+            //Ajax
+            add_action("wp_ajax_hd_js_action" , array($this, 'HandelAjax')); 
         }
         /**
          * Summary of AddMenuAdmin
@@ -119,6 +121,8 @@ if (!class_exists('AdminMenu')) {
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_REQUEST['submit-btn'])) {
                 //Sanitize
                 $fullName =   sanitize_text_field($_REQUEST['fullname']) ?? '';
+                $year =   sanitize_text_field($_REQUEST['year-brith']) ?? '';
+
                 $nameAddress =   sanitize_text_field($_REQUEST['nameAddress']) ?? '';
                 $phone =   sanitize_text_field($_REQUEST['phone']) ?? '';
                 $branch_id = isset($_REQUEST['branch_']) ? intval($_REQUEST['branch_']) : 0; 
@@ -131,6 +135,7 @@ if (!class_exists('AdminMenu')) {
 
                 $wpdb->insert("{$perfix}hd_manager_customer", [
                     'fullname' => $fullName,
+                    'year_birth' =>  $year,
                     'address_info' =>  $nameAddress,
                     'phone' =>  $phone,
                     'code' => $code,
@@ -208,6 +213,21 @@ if (!class_exists('AdminMenu')) {
         public function RegisterScript($hook)
         {
             wp_register_style('add-news-style', HDEL_PLUGIN_URL . '/asset/add-new.css', array(), 'all');
+            wp_register_script('manager-script', HDEL_PLUGIN_URL . '/asset/script.js', array('jquery'), HDEL_VERSION_CSS_JS, true);
+
+           
+            
+            $manager = ['toplevel_page_hd-manager-customer',];
+
+            if(in_array($hook, $manager)){
+
+                // $data = 'hd_plugin_ajax_url="'. admin_url('admin-ajax.php') .'"';
+                $urlAjax = admin_url('admin-ajax.php');
+                $data = "var url_ajax_plugin_manager_customer = '$urlAjax'";
+
+                wp_add_inline_script('manager-script', $data, 'before');
+                wp_enqueue_script('manager-script');
+            }
 
             $arr = [
                 'manager-customer_page_hd-add-customer',
@@ -217,6 +237,38 @@ if (!class_exists('AdminMenu')) {
             if ( in_array($hook, $arr) ) {
                 wp_enqueue_style('add-news-style');
             }
+        }
+        public function HandelAjax(){
+            
+            global $wpdb;
+
+            $table = $wpdb->prefix.'hd_manager_customer';
+
+            $action_type = $_REQUEST['param'] ?? "";
+
+            $fomat_warranty_time = date('Y-m-d', strtotime(str_replace('/', '-', $_REQUEST['warranty'])));
+
+            if( $action_type == 'save_quick_form' ){
+                $wpdb->update($table,[
+                    'code' => $_REQUEST['code'],
+                    'fullname' => $_REQUEST['fullName'],
+                    'address_info' =>  $_REQUEST['address'],
+                    'phone' =>  $_REQUEST['phone'],
+                    'active' => $this->UpdateActive($fomat_warranty_time),
+                    'warranty_time' => $fomat_warranty_time,
+                    // 'branch_id' =>  $_REQUEST['branch'],
+                    'service_' => $_REQUEST['service'],
+                    'note' => $_REQUEST['note'],
+                ],[
+                    'id' => $_REQUEST['id'],
+                ]);
+                echo json_encode([
+                    'status' => 1,
+                    'mess' => 'Data Updated',
+                ]);
+            }
+
+            wp_die();
         }
     }
     AdminMenu::GetInstance();
