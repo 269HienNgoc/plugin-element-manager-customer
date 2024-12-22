@@ -38,7 +38,7 @@
   </div>
   <div class="form-group">
     <label for="note">Ghi Chú</label>
-    <textarea id="note" name="note" rows="4" cols="88"> </textarea>
+    <textarea id="note" name="note" rows="4" cols="80"> </textarea>
   </div>
   <button type="submit" name="submit-btn" class="submit-btn">Lưu</button>
 </form>

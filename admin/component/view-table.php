@@ -4,6 +4,7 @@ if (!class_exists('List_table')) {
 }
 $my_list_table = new List_table();
 $my_list_table->prepare_items();
+
 ?>
 <div class="title"><h1>QUẢN LÝ KHÁCH HÀNG - THỜI GIAN BẢO HÀNH</h1></div>
 <div class="wrap">

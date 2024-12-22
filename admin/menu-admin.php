@@ -134,7 +134,7 @@ if (!class_exists('AdminMenu')) {
                     'address_info' =>  $nameAddress,
                     'phone' =>  $phone,
                     'code' => $code,
-                    'active' => 0,
+                    'active' => $this->UpdateActive($fomat_warranty_time),
                     'warranty_time' => $fomat_warranty_time,
                     'branch_id' =>  $branch_id,
                     'service_' => $service_,
@@ -148,6 +148,22 @@ if (!class_exists('AdminMenu')) {
                 } else {
                     $this->mess = "Tạo thất bại...";
                 }
+            }
+        }
+
+        private function UpdateActive ($warranty){
+
+            $current_date = date('Y-m-d');
+            $active = 0;
+
+            $star = strtotime($current_date);
+
+            $expri_ = strtotime($warranty . '+ 1 day');
+
+            if($star >= $expri_){
+                return $active;
+            } else {
+                return $active = 1;
             }
         }
 

@@ -10,9 +10,9 @@ class List_table extends WP_List_Table
             'cb'        => '<input type="checkbox" />', //Render a checkbox instead of text
             'id'    => 'ID',
             'code'      => 'Mã Code',
-            'fullname'    => 'ID',
-            'address_info'  => 'Tên Chi Nhánh',
-            'phone'  => 'Địa chỉ',
+            'fullname'    => 'Họ và tên',
+            'address_info'  => 'Địa chỉ',
+            'phone'  => 'SĐT',
             'active'  => 'Tình trạng',
             'warranty_time'  => 'Bảo hành tới',
             'branch_id'  => 'Chi Nhánh',
@@ -26,11 +26,8 @@ class List_table extends WP_List_Table
     public function get_sortable_columns()
     {
         $sortable_columns = array(
-            'id'  => array('id', true),  //true means it's already sorted
-            // 'name_address' => array('name_address', true),
-            // 'address_line' => array('address_line', false),
-            // 'img_url' => array('img_url', false),
-            // 'phone' => array('phone', false),
+            'id'  => array('id', true),
+            'code'  => array('code', true),
             'fullname' => array('fullname', true),
         );
         return $sortable_columns;
@@ -41,7 +38,7 @@ class List_table extends WP_List_Table
         global $wpdb;
         $this->_column_headers = [$this->get_columns(), [], $this->get_sortable_columns()];
 
-        echo $this->current_action();
+        $action_table = $this->current_action();
 
         $table = $wpdb->prefix . 'hd_manager_customer';
 
@@ -61,7 +58,8 @@ class List_table extends WP_List_Table
             $total_items  = $wpdb->get_var("SELECT COUNT(*)
                                                     FROM $table a
                                                     LEFT JOIN {$wpdb->prefix}hd_branch p ON a.branch_id = p.id
-                                                    WHERE a.fullname LIKE '%{$search}%' 
+                                                    WHERE a.fullname LIKE '%{$search}%'
+                                                    OR a.code LIKE '%{$search}%' 
                                                     OR p.branch_name LIKE '%{$search}%'"); // Đếm tổng số bản ghi
             // Lấy dữ liệu từ database
             $this->items = $wpdb->get_results("SELECT 
@@ -73,6 +71,8 @@ class List_table extends WP_List_Table
                                                 {$wpdb->prefix}hd_branch p ON a.branch_id = p.id
                                             WHERE
                                                  a.fullname LIKE '%{$search}%' 
+                                                OR
+                                                 a.code LIKE '%{$search}%' 
                                                 OR p.branch_name LIKE '%{$search}%'
                                             ORDER BY a.id
                                             LIMIT {$per_page}", ARRAY_A);
@@ -97,12 +97,17 @@ class List_table extends WP_List_Table
             'per_page'    => $per_page,
             'total_pages' => ceil($total_items / $per_page)
         ));
+
+        if(!empty($action_table)){
+            $this->ModifyActionBtn($action_table);
+        }
     }
 
     public function column_default($item, $column_name)
     {
         // var_dump($item);
         switch ($column_name) {
+            case 'cb':
             case 'id':
             case 'code':
             case 'fullname':
@@ -134,7 +139,7 @@ class List_table extends WP_List_Table
             switch ( $column_name ) {
 
                 case 'cb':
-                    echo "<td $attributes>". sprintf('<input type="checkbox" name="my_list_table[]" value="%s" />', $item['id']) . "</td>";
+                    echo "<td $attributes>". sprintf('<input type="checkbox" name="my_list_table[]" value="%s" />' , $item['id']) . "</td>";
                     break;
 
                 case 'id':
@@ -149,16 +154,12 @@ class List_table extends WP_List_Table
                     echo "<td class='$column_name column-$column_name'>";
 
                     echo $item['fullname'] . '<br>' ;
-                    
-                    // Nút "Xem"
-                    echo '<a href="?page=my_page&action=view&id=' . $item['id'] . '">Xem</a> |';
     
                     // Nút "Sửa"
-                    echo '<a href="?page=my_page&action=edit&id=' . $item['id'] . '">Sửa</a> |';
+                    echo '<a href="?page=my_page&action=edit&id=' . $item['id'] . '">Sửa</a> | ';
     
                     // Nút "Xóa"
-                    echo '<a href="?page=hd_manager_customer&action=delete&id=' . $item['id'] . '" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>';
-    
+                    echo '<a style="color: #ff0000;" href="?page=hd_manager_customer&action=delete&id=' . $item['id'] . '" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>';
                     echo "</td>";
                     break;
 
@@ -166,8 +167,12 @@ class List_table extends WP_List_Table
                     echo "<td $attributes>" . $item['address_info'] . "</td>";  
                     break;
 
+                case 'phone':
+                    echo "<td $attributes>" . $item['phone'] . "</td>";
+                    break;
+
                 case 'active':
-                    echo "<td $attributes> Col Actice here </td>";
+                    echo "<td $attributes>" . $this->CheckActive($item['active']) . "</td>";
                     break;
 
                 case 'warranty_time':
@@ -175,7 +180,7 @@ class List_table extends WP_List_Table
                     break;
 
                 case 'branch_id':
-                    echo "<td $attributes>" . $item['branch_id'] . "</td>";
+                    echo "<td $attributes>" . $item['branch_name'] . "</td>";
                     break;
                 case 'service_':
                     echo "<td $attributes>" . $item['service_'] . "</td>";
@@ -187,22 +192,32 @@ class List_table extends WP_List_Table
         }
     }
 
-    public function ModifyActionBtn( $actions, $id){
+    private function CheckActive(int $active_) {
+        $mess = '';
+        if($active_ == 0){
+            return $mess = '<p style="color: #ff0000">Hết hạn</p>';
+        } else if($active_ == 1) {
+            return $mess = '<p style="color: #00b715">Còn Hạn</p>';
+        }
+    }
 
-        if ( isset( $actions ) ?? null || isset($id) ?? null ) {
+    public function ModifyActionBtn( $id){
+        global $wpdb;
+        $actions = $this->current_action();
+        if ( $_REQUEST['id'] != '' && $_REQUEST['id'] != null ) {
             switch ( $actions ) {
-                case 'view':
-                    // Xử lý hành động "Xem"
-                    break;
                 case 'edit':
                     // Xử lý hành động "Sửa"
+
                     break;
                 case 'delete':
                     // Xử lý hành động "Xóa"
+                    $wpdb->delete("{$wpdb->prefix}", [
+                        'id' =>  $_REQUEST['id'],
+                    ]);
             break;
             }
         }
-
-
     }
+
 }
