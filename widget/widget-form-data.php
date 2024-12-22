@@ -58,7 +58,7 @@ class Widget_form_data extends Widget_Base
                                                     $table a
                                                 LEFT JOIN {$wpdb->prefix}hd_branch p ON a.branch_id = p.id
                                                 WHERE
-                                                    code = '{$search}' ", output: ARRAY_A);
+                                                    code = '{$search}' ", ARRAY_A);
             return $result;
         }
 

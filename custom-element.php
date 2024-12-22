@@ -7,15 +7,14 @@
 define('HDEL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HDEL_PLUGIN_URL', plugin_dir_url(__FILE__));
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 require_once HDEL_PLUGIN_DIR . 'database/create-db.php';
 require_once HDEL_PLUGIN_DIR . 'admin/menu-admin.php';
 
 
-
-
- if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
 
 final class Custom_element {
     public function __construct(){
